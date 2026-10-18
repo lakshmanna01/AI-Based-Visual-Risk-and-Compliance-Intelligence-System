@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card p-4 rounded-4 shadow-sm">
+                <h3 class="fw-bold mb-4"><i class="fas fa-sliders-h me-2 text-primary"></i>Account &amp; Appearance Settings</h3>
+                
+                <div class="mb-4">
+                    <h5 class="fw-semibold">Appearance Theme</h5>
+                    <p class="text-muted small">Choose between Light or Dark display theme.</p>
+                    <div class="d-flex gap-3">
+                        <button class="btn btn-outline-primary" onclick="setAppTheme('light')">
+                            <i class="fas fa-sun me-1"></i> Light Theme
+                        </button>
+                        <button class="btn btn-outline-primary" onclick="setAppTheme('dark')">
+                            <i class="fas fa-moon me-1"></i> Dark Theme
+                        </button>
+                    </div>
+                </div>
+
+                <hr class="my-4">
+
+                <div class="mb-4">
+                    <h5 class="fw-semibold">Profile Overview</h5>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item bg-transparent d-flex justify-content-between">
+                            <span class="text-muted">Username:</span>
+                            <strong>{{ current_user.username }}</strong>
+                        </li>
+                        <li class="list-group-item bg-transparent d-flex justify-content-between">
+                            <span class="text-muted">Email:</span>
+                            <strong>{{ current_user.email }}</strong>
+                        </li>
+                        <li class="list-group-item bg-transparent d-flex justify-content-between">
+                            <span class="text-muted">Role:</span>
+                            <span class="badge bg-{{ 'danger' if current_user.is_admin else 'primary' }}">{{ 'Administrator' if current_user.is_admin else 'Standard User' }}</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function setAppTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+    const toggle = document.getElementById('themeToggle');
+    if (toggle) {
+        const icon = toggle.querySelector('i');
+        if (icon) {
+            icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+        }
+    }
+}
+</script>
+{% endblock %}

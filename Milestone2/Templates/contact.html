@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+    .contact-wrapper {
+        padding: 4rem 1rem;
+    }
+    .contact-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+    .contact-info-card {
+        border-radius: 16px;
+        padding: 1.8rem;
+        height: 100%;
+        border: 1px solid var(--border-color);
+        background: var(--bg-card);
+    }
+    .contact-info-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        background: var(--accent-gradient);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        margin-bottom: 1rem;
+    }
+    .contact-form-card {
+        border-radius: 20px;
+        border: 1px solid var(--border-color);
+        background: var(--bg-card);
+        padding: 2.5rem;
+        box-shadow: var(--shadow);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="contact-wrapper">
+    <div class="container">
+        <div class="contact-header">
+            <h1 class="display-6 fw-bold">Get In <span style="background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Touch</span></h1>
+            <p class="text-muted">Have inquiries regarding the AI-Based Visual Risk &amp; Compliance platform? Our team is here to assist.</p>
+        </div>
+
+        <div class="row g-4 justify-content-center">
+            <!-- Left Info Column -->
+            <div class="col-lg-4">
+                <div class="d-flex flex-column gap-3 h-100">
+                    <div class="contact-info-card">
+                        <div class="contact-info-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <h6 class="fw-bold mb-1">Our Headquarters</h6>
+                        <p class="text-muted small mb-0">Innovation Hub, AI Research Park, Tech District</p>
+                    </div>
+
+                    <div class="contact-info-card">
+                        <div class="contact-info-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <h6 class="fw-bold mb-1">Email Support</h6>
+                        <p class="text-muted small mb-0">support@visualrisk.ai<br>compliance@visualrisk.ai</p>
+                    </div>
+
+                    <div class="contact-info-card">
+                        <div class="contact-info-icon">
+                            <i class="fas fa-phone-alt"></i>
+                        </div>
+                        <h6 class="fw-bold mb-1">Direct Line</h6>
+                        <p class="text-muted small mb-0">+1 (800) 555-RISK<br>Mon-Fri, 9am - 6pm EST</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Form Column -->
+            <div class="col-lg-8">
+                <div class="contact-form-card">
+                    <h4 class="fw-bold mb-4">Send Us a Message</h4>
+                    <form method="POST" action="{{ url_for('contact') }}">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold small text-muted">Your Name</label>
+                                <input type="text" name="name" class="form-control" placeholder="John Doe" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold small text-muted">Your Email</label>
+                                <input type="email" name="email" class="form-control" placeholder="john@example.com" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold small text-muted">Subject</label>
+                                <input type="text" name="subject" class="form-control" placeholder="Inquiry about Visual Risk Intelligence" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold small text-muted">Message</label>
+                                <textarea name="message" rows="5" class="form-control" placeholder="Type your message here..." required></textarea>
+                            </div>
+                            <div class="col-12 mt-4">
+                                <button type="submit" class="btn btn-primary px-4 py-2 fw-semibold">
+                                    <i class="fas fa-paper-plane me-2"></i>Send Message
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

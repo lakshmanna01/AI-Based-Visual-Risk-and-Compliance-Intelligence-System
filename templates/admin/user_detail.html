@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-0">
+                <span class="user-avatar me-2">{{ user.username[0]|upper }}</span>
+                {{ user.username }}'s Digital Twin Profile
+            </h2>
+            <p class="text-muted small mb-0">{{ user.email }} • Registered {{ user.created_at.strftime('%Y-%m-%d') }}</p>
+        </div>
+        <a href="{{ url_for('admin_users') }}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Back to Users
+        </a>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card p-3 rounded-4 shadow-sm border">
+                <span class="text-muted small">Savings Balance</span>
+                <h4 class="fw-bold text-success mb-0">₹{{ '{:,.0f}'.format(user.savings) }}</h4>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3 rounded-4 shadow-sm border">
+                <span class="text-muted small">Predicted GPA</span>
+                <h4 class="fw-bold text-primary mb-0">{{ gpa['gpa'] }} / 4.0</h4>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3 rounded-4 shadow-sm border">
+                <span class="text-muted small">Fitness Active Time</span>
+                <h4 class="fw-bold text-info mb-0">{{ total_fitness }} min</h4>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3 rounded-4 shadow-sm border">
+                <span class="text-muted small">Goals Achieved</span>
+                <h4 class="fw-bold text-warning mb-0">{{ achieved_goals }} / {{ total_goals }}</h4>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <div class="card p-4 rounded-4 shadow-sm border h-100">
+                <h6 class="fw-bold mb-3"><i class="fas fa-coins me-2 text-primary"></i>Income vs Expense History</h6>
+                <div style="height: 220px;">
+                    <canvas id="adminUserFinanceChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card p-4 rounded-4 shadow-sm border h-100">
+                <h6 class="fw-bold mb-3"><i class="fas fa-book me-2 text-purple"></i>Study Hours (14 Days)</h6>
+                <div style="height: 220px;">
+                    <canvas id="adminUserStudyChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activities -->
+    <div class="card p-4 rounded-4 shadow-sm border">
+        <h5 class="fw-bold mb-3"><i class="fas fa-history me-2 text-primary"></i>Recent Transactions</h5>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>Category</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if recent_transactions %}
+                        {% for tx in recent_transactions %}
+                        <tr>
+                            <td>{{ tx.date.strftime('%Y-%m-%d') }}</td>
+                            <td><span class="badge bg-{{ 'success' if tx.type == 'income' else 'danger' }}">{{ tx.type }}</span></td>
+                            <td>{{ tx.category }}</td>
+                            <td class="fw-bold">₹{{ '{:,.2f}'.format(tx.amount) }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-3">No transactions found for this user.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const months = {{ months|tojson }};
+const incomeData = {{ income_data|tojson }};
+const expenseData = {{ expense_data|tojson }};
+
+const ctx1 = document.getElementById('adminUserFinanceChart').getContext('2d');
+new Chart(ctx1, {
+    type: 'bar',
+    data: {
+        labels: months,
+        datasets: [
+            { label: 'Income', data: incomeData, backgroundColor: '#3b82f6', borderRadius: 4 },
+            { label: 'Expenses', data: expenseData, backgroundColor: '#ef4444', borderRadius: 4 }
+        ]
+    },
+    options: { responsive: true, maintainAspectRatio: false }
+});
+
+const studyDays = {{ study_days|tojson }};
+const studyHours = {{ study_hours|tojson }};
+
+const ctx2 = document.getElementById('adminUserStudyChart').getContext('2d');
+new Chart(ctx2, {
+    type: 'line',
+    data: {
+        labels: studyDays,
+        datasets: [{
+            label: 'Hours',
+            data: studyHours,
+            borderColor: '#8b5cf6',
+            backgroundColor: 'rgba(139, 92, 246, 0.1)',
+            fill: true
+        }]
+    },
+    options: { responsive: true, maintainAspectRatio: false }
+});
+</script>
+{% endblock %}

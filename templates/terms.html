@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+    .terms-hero {
+        background: var(--accent-gradient);
+        color: white;
+        padding: 3.5rem 0 3rem;
+        margin-bottom: 2.5rem;
+        border-radius: 0 0 30px 30px;
+    }
+    .terms-card {
+        border-radius: 18px;
+        border: 1px solid var(--border-color);
+        background: var(--bg-card);
+        box-shadow: var(--shadow);
+        padding: 2.5rem;
+    }
+    .terms-nav-link {
+        color: var(--text-muted);
+        text-decoration: none;
+        padding: 0.6rem 1rem;
+        display: block;
+        border-radius: 8px;
+        transition: all 0.2s;
+        font-weight: 500;
+        font-size: 0.95rem;
+    }
+    .terms-nav-link:hover, .terms-nav-link.active {
+        color: var(--accent);
+        background: rgba(102, 126, 234, 0.1);
+    }
+    .section-anchor {
+        scroll-margin-top: 90px;
+    }
+    .terms-warning-box {
+        background: rgba(245, 158, 11, 0.08);
+        border-left: 4px solid #f59e0b;
+        padding: 1.25rem;
+        border-radius: 0 12px 12px 0;
+        margin: 1.5rem 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Header -->
+<div class="terms-hero text-center">
+    <div class="container">
+        <span class="badge bg-white text-dark rounded-pill px-3 py-2 mb-3 shadow-sm fw-semibold">
+            <i class="fas fa-file-contract text-primary me-1"></i> User Agreement
+        </span>
+        <h1 class="display-5 fw-bold mb-2">Terms of Service</h1>
+        <p class="lead opacity-90 mb-2">Governing the utilization of the AI-Based Visual Risk and Compliance Intelligence System.</p>
+        <span class="small opacity-75"><i class="far fa-calendar-alt me-1"></i> Effective Date: October 2026</span>
+    </div>
+</div>
+
+<div class="terms-wrapper pb-5">
+    <div class="container">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}" class="text-decoration-none">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Terms of Service</li>
+            </ol>
+        </nav>
+
+        <div class="row g-4">
+            <!-- Sidebar Navigation -->
+            <div class="col-lg-3">
+                <div class="card p-3 rounded-4 border sticky-top" style="top: 100px;">
+                    <h6 class="fw-bold px-3 pt-2 text-uppercase text-muted small">Sections</h6>
+                    <nav class="nav flex-column">
+                        <a class="terms-nav-link" href="#acceptance"><i class="fas fa-check-square me-2"></i>1. Acceptance</a>
+                        <a class="terms-nav-link" href="#services"><i class="fas fa-cubes me-2"></i>2. Service Scope</a>
+                        <a class="terms-nav-link" href="#disclaimer"><i class="fas fa-exclamation-triangle me-2"></i>3. Disclaimers</a>
+                        <a class="terms-nav-link" href="#responsibilities"><i class="fas fa-user-shield me-2"></i>4. User Duties</a>
+                        <a class="terms-nav-link" href="#intellectual"><i class="fas fa-copyright me-2"></i>5. Intellectual Rights</a>
+                        <a class="terms-nav-link" href="#liability"><i class="fas fa-balance-scale me-2"></i>6. Liability Limits</a>
+                        <a class="terms-nav-link" href="#contact"><i class="fas fa-question-circle me-2"></i>7. Inquiries</a>
+                    </nav>
+                    <hr class="my-3">
+                    <div class="px-2">
+                        <small class="text-muted d-block mb-2">Related Document</small>
+                        <a href="{{ url_for('privacy') }}" class="btn btn-sm btn-outline-primary w-100">
+                            <i class="fas fa-shield-alt me-1"></i> Privacy Policy
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Terms Body -->
+            <div class="col-lg-9">
+                <div class="terms-card">
+                    <section id="acceptance" class="section-anchor mb-5">
+                        <h3 class="fw-bold text-primary mb-3"><i class="fas fa-check-square me-2"></i>1. Acceptance of Terms</h3>
+                        <p class="text-muted">
+                            By creating an account, browsing this portal, or executing future simulations within the <strong>AI-Based Visual Risk and Compliance Intelligence System</strong>, you acknowledge that you have read, understood, and agreed to be legally bound by these Terms of Service. If you do not accept these terms, you are prohibited from accessing the system.
+                        </p>
+                    </section>
+
+                    <section id="services" class="section-anchor mb-5">
+                        <h3 class="fw-bold text-primary mb-3"><i class="fas fa-cubes me-2"></i>2. Scope of Decision Support Services</h3>
+                        <p class="text-muted">
+                            The platform delivers an integrated digital representation of individual habits, academic study trends, financial income/expenses, and physical workouts. Core services encompass:
+                        </p>
+                        <ul class="text-muted">
+                            <li>Personalized dashboards highlighting financial savings rates, predicted GPA, and weekly activity streaks.</li>
+                            <li>Linear Regression forecasting for multi-month financial and academic trajectories.</li>
+                            <li>Scenario-based what-if simulation engines computing impact and risk classifications.</li>
+                            <li>Conversational artificial intelligence assistance powered by Gemini AI and contextual user metrics.</li>
+                        </ul>
+                    </section>
+
+                    <section id="disclaimer" class="section-anchor mb-5">
+                        <h3 class="fw-bold text-primary mb-3"><i class="fas fa-exclamation-triangle text-warning me-2"></i>3. Predictive Intelligence &amp; Advisory Disclaimer</h3>
+                        <div class="terms-warning-box">
+                            <h6 class="fw-bold text-dark mb-1"><i class="fas fa-info-circle me-1"></i> Analytical and Educational Purpose Only</h6>
+                            <p class="small text-muted mb-0">
+                                Projections, simulations, GPA predictions, and financial forecasts computed by this system are statistical approximations based on historical data. They do <strong>not</strong> constitute certified financial planning, certified academic guarantees, or medical fitness prescriptions.
+                            </p>
+                        </div>
+                        <p class="text-muted">
+                            Users are solely responsible for verifying advice with professional certified advisors before committing to financial investments, loan obligations, or rigorous athletic conditioning programs.
+                        </p>
+                    </section>
+
+                    <section id="responsibilities" class="section-anchor mb-5">
+                        <h3 class="fw-bold text-primary mb-3"><i class="fas fa-user-shield me-2"></i>4. User Account &amp; Credential Responsibilities</h3>
+                        <p class="text-muted">
+                            To ensure platform compliance and integrity, you agree to:
+                        </p>
+                        <ul class="text-muted">
+                            <li>Maintain a secure password containing a minimum of 8 characters.</li>
+                            <li>Refrain from sharing account access credentials or impersonating administrative personnel.</li>
+                            <li>Notify system administrators immediately of any unauthorized account access or data breach.</li>
+                            <li>Ensure that all logged metrics reflect genuine personal activities to preserve simulation accuracy.</li>
+                        </ul>
+                    </section>
+
+                    <section id="intellectual" class="section-anchor mb-5">
+                        <h3 class="fw-bold text-primary mb-3"><i class="fas fa-copyright me-2"></i>5. Intellectual Property Rights</h3>
+                        <p class="text-muted">
+                            All proprietary machine learning algorithms, visualization charts, graphic interfaces, system architectures, and documentation are the exclusive intellectual property of the Visual Risk and Compliance Intelligence System. You are granted a revocable, non-exclusive license to utilize the platform for personal lifestyle management.
+                        </p>
+                    </section>
+
+                    <section id="liability" class="section-anchor mb-5">
+                        <h3 class="fw-bold text-primary mb-3"><i class="fas fa-balance-scale me-2"></i>6. Limitation of Liability</h3>
+                        <p class="text-muted">
+                            Under no circumstances shall the platform operators, authors, or hosting providers be liable for indirect, incidental, special, or consequential damages resulting from reliance upon simulation outcomes, temporary downtime, or discrepancies in predictive calculations.
+                        </p>
+                    </section>
+
+                    <section id="contact" class="section-anchor">
+                        <h3 class="fw-bold text-primary mb-3"><i class="fas fa-question-circle me-2"></i>7. Inquiries &amp; Amendments</h3>
+                        <p class="text-muted">
+                            We reserve the right to amend these Terms periodically. Continued utilization of the platform after updates constitutes binding acceptance. For questions regarding our Terms of Service:
+                        </p>
+                        <div class="p-3 bg-light rounded-3 border d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <div>
+                                <span class="fw-bold d-block">Legal &amp; Regulatory Affairs</span>
+                                <span class="text-muted small">legal@visualrisk.ai</span>
+                            </div>
+                            <a href="{{ url_for('contact') }}" class="btn btn-primary btn-sm px-3">
+                                <i class="fas fa-envelope me-1"></i> Contact Legal Team
+                            </a>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

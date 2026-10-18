@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+    .privacy-hero {
+        background: var(--accent-gradient);
+        color: white;
+        padding: 3.5rem 0 3rem;
+        margin-bottom: 2.5rem;
+        border-radius: 0 0 30px 30px;
+    }
+    .privacy-card {
+        border-radius: 18px;
+        border: 1px solid var(--border-color);
+        background: var(--bg-card);
+        box-shadow: var(--shadow);
+        padding: 2.5rem;
+    }
+    .privacy-nav-link {
+        color: var(--text-muted);
+        text-decoration: none;
+        padding: 0.6rem 1rem;
+        display: block;
+        border-radius: 8px;
+        transition: all 0.2s;
+        font-weight: 500;
+        font-size: 0.95rem;
+    }
+    .privacy-nav-link:hover, .privacy-nav-link.active {
+        color: var(--accent);
+        background: rgba(102, 126, 234, 0.1);
+    }
+    .section-anchor {
+        scroll-margin-top: 90px;
+    }
+    .policy-highlight {
+        background: rgba(102, 126, 234, 0.08);
+        border-left: 4px solid var(--accent);
+        padding: 1.25rem;
+        border-radius: 0 12px 12px 0;
+        margin: 1.5rem 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Header -->
+<div class="privacy-hero text-center">
+    <div class="container">
+        <span class="badge bg-white text-dark rounded-pill px-3 py-2 mb-3 shadow-sm fw-semibold">
+            <i class="fas fa-shield-alt text-primary me-1"></i> Legal &amp; Compliance
+        </span>
+        <h1 class="display-5 fw-bold mb-2">Privacy Policy</h1>
+        <p class="lead opacity-90 mb-2">How we safeguard your digital twin profile, behavioral habits, and predictive intelligence data.</p>
+        <span class="small opacity-75"><i class="far fa-calendar-alt me-1"></i> Effective Date: October 2026</span>
+    </div>
+</div>
+
+<div class="privacy-wrapper pb-5">
+    <div class="container">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}" class="text-decoration-none">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Privacy Policy</li>
+            </ol>
+        </nav>
+
+        <div class="row g-4">
+            <!-- Sidebar Navigation -->
+            <div class="col-lg-3">
+                <div class="card p-3 rounded-4 border sticky-top" style="top: 100px;">
+                    <h6 class="fw-bold px-3 pt-2 text-uppercase text-muted small">Sections</h6>
+                    <nav class="nav flex-column">
+                        <a class="privacy-nav-link" href="#overview"><i class="fas fa-info-circle me-2"></i>1. Overview</a>
+                        <a class="privacy-nav-link" href="#data-collected"><i class="fas fa-database me-2"></i>2. Data Collected</a>
+                        <a class="privacy-nav-link" href="#ai-processing"><i class="fas fa-brain me-2"></i>3. AI Processing</a>
+                        <a class="privacy-nav-link" href="#security"><i class="fas fa-lock me-2"></i>4. Security Standards</a>
+                        <a class="privacy-nav-link" href="#user-rights"><i class="fas fa-user-check me-2"></i>5. Your Rights</a>
+                        <a class="privacy-nav-link" href="#contact"><i class="fas fa-envelope me-2"></i>6. Contact Officer</a>
+                    </nav>
+                    <hr class="my-3">
+                    <div class="px-2">
+                        <small class="text-muted d-block mb-2">Related Document</small>
+                        <a href="{{ url_for('terms') }}" class="btn btn-sm btn-outline-primary w-100">
+                            <i class="fas fa-file-contract me-1"></i> Terms of Service
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Policy Body -->
+            <div class="col-lg-9">
+                <div class="privacy-card">
+                    <section id="overview" class="section-anchor mb-5">
+                        <h3 class="fw-bold text-primary mb-3"><i class="fas fa-info-circle me-2"></i>1. Platform Overview</h3>
+                        <p class="text-muted">
+                            The <strong>AI-Based Visual Risk and Compliance Intelligence System</strong> is committed to preserving the privacy and data integrity of all users who interact with our personal decision-support algorithms. This Privacy Policy clarifies how personal identifiers, financial telemetry, academic study statistics, and wellness metrics are collected, synthesized, and secured within your digital twin environment.
+                        </p>
+                        <div class="policy-highlight">
+                            <h6 class="fw-bold mb-1"><i class="fas fa-check-circle text-primary me-2"></i>Core Privacy Commitment</h6>
+                            <p class="mb-0 small text-muted">Your behavioral telemetry and lifestyle metrics are strictly utilized to compute personalized risk scores and simulation projections. We never monetize, lease, or distribute your raw decision logs to unauthorized external brokers.</p>
+                        </div>
+                    </section>
+
+                    <section id="data-collected" class="section-anchor mb-5">
+                        <h3 class="fw-bold text-primary mb-3"><i class="fas fa-database me-2"></i>2. Categories of Data Collected</h3>
+                        <p class="text-muted">To construct an accurate digital model and produce predictive foresight, our system processes the following data tiers:</p>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="p-3 rounded-3 bg-light border h-100">
+                                    <h6 class="fw-bold text-dark"><i class="fas fa-user-tag me-2 text-primary"></i>Profile Identifiers</h6>
+                                    <p class="small text-muted mb-0">Username, email address, hashed credentials, occupation, age, baseline savings, and declared financial parameters.</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="p-3 rounded-3 bg-light border h-100">
+                                    <h6 class="fw-bold text-dark"><i class="fas fa-money-bill-wave me-2 text-success"></i>Financial Transactions</h6>
+                                    <p class="small text-muted mb-0">Income allocations, expense categories, transaction timestamps, and net cashflow telemetry used for 6-month forecasting.</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="p-3 rounded-3 bg-light border h-100">
+                                    <h6 class="fw-bold text-dark"><i class="fas fa-book-reader me-2 text-purple"></i>Study Intelligence</h6>
+                                    <p class="small text-muted mb-0">Study duration, academic subject classifications, self-reported productivity ratings, and consecutive learning streaks.</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="p-3 rounded-3 bg-light border h-100">
+                                    <h6 class="fw-bold text-dark"><i class="fas fa-heartbeat me-2 text-danger"></i>Fitness &amp; Wellness Logs</h6>
+                                    <p class="small text-muted mb-0">Physical workout activities, active duration (minutes), estimated calories burned, and 150-minute weekly progress.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="ai-processing" class="section-anchor mb-5">
+                        <h3 class="fw-bold text-primary mb-3"><i class="fas fa-brain me-2"></i>3. Machine Learning &amp; AI Processing</h3>
+                        <p class="text-muted">
+                            Our platform applies machine learning (scikit-learn Linear Regression) and pattern analysis to generate projections. 
+                            When interacting with the AI Assistant, conversational queries alongside aggregated user lifestyle metrics are evaluated using Google Gemini generative AI (or internal rule-based inference models when offline).
+                        </p>
+                        <p class="text-muted">
+                            No confidential banking passwords or sensitive credentials are ever transmitted into the generative AI prompt context.
+                        </p>
+                    </section>
+
+                    <section id="security" class="section-anchor mb-5">
+                        <h3 class="fw-bold text-primary mb-3"><i class="fas fa-lock me-2"></i>4. Security &amp; Encryption Standards</h3>
+                        <p class="text-muted">
+                            We implement defense-in-depth measures to safeguard user records:
+                        </p>
+                        <ul class="text-muted">
+                            <li><strong>Cryptographic Password Hashing:</strong> Passwords are encrypted utilizing Werkzeug's secure hashing functions (`generate_password_hash` with PBKDF2/scrypt).</li>
+                            <li><strong>Session Management:</strong> Authenticated sessions are managed via Flask-Login with encrypted session cookies.</li>
+                            <li><strong>Role-Based Access Control (RBAC):</strong> Administrative endpoints are strictly partitioned from user accounts through verified permissions.</li>
+                            <li><strong>Isolated Database Storage:</strong> SQLite database records are stored with constrained server permissions.</li>
+                        </ul>
+                    </section>
+
+                    <section id="user-rights" class="section-anchor mb-5">
+                        <h3 class="fw-bold text-primary mb-3"><i class="fas fa-user-check me-2"></i>5. User Control &amp; Data Rights</h3>
+                        <p class="text-muted">
+                            You maintain continuous ownership and governance over your digital representation:
+                        </p>
+                        <div class="table-responsive">
+                            <table class="table table-bordered small">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Right</th>
+                                        <th>Mechanism</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Inspection</strong></td>
+                                        <td>Review all transactions, study sessions, and fitness activities on the Personal Dashboard.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Rectification</strong></td>
+                                        <td>Edit any logged transaction, study record, or fitness entry through interactive modal dialogs.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Erasure</strong></td>
+                                        <td>Delete individual telemetry entries or clear entire simulation histories with one click.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                    <section id="contact" class="section-anchor">
+                        <h3 class="fw-bold text-primary mb-3"><i class="fas fa-envelope me-2"></i>6. Contact Compliance Officer</h3>
+                        <p class="text-muted">
+                            If you have inquiries, privacy concerns, or requests regarding this Privacy Policy, please contact our data privacy officer:
+                        </p>
+                        <div class="p-3 bg-light rounded-3 border d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <div>
+                                <span class="fw-bold d-block">Data Protection Office</span>
+                                <span class="text-muted small">compliance@visualrisk.ai</span>
+                            </div>
+                            <a href="{{ url_for('contact') }}" class="btn btn-primary btn-sm px-3">
+                                <i class="fas fa-paper-plane me-1"></i> Open Contact Form
+                            </a>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

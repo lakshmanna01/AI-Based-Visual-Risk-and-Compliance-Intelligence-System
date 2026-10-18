@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="study-wrapper py-4">
+    <div class="container">
+        <!-- Top Metrics Cards -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="card p-3 rounded-4 shadow-sm border">
+                    <span class="text-muted small">Predicted GPA</span>
+                    <h3 class="fw-bold text-primary mb-0">{{ gpa['gpa'] }} / 4.0</h3>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card p-3 rounded-4 shadow-sm border">
+                    <span class="text-muted small">Total Hours Logged</span>
+                    <h3 class="fw-bold text-success mb-0">{{ total_hours }} hrs</h3>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card p-3 rounded-4 shadow-sm border">
+                    <span class="text-muted small">Avg Productivity</span>
+                    <h3 class="fw-bold text-warning mb-0">{{ avg_productivity|round(1) }}%</h3>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card p-3 rounded-4 shadow-sm border">
+                    <span class="text-muted small">Study Streak</span>
+                    <h3 class="fw-bold text-info mb-0">{{ study_streak }} Days</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <!-- Log Session Form -->
+            <div class="col-lg-4">
+                <div class="card p-4 rounded-4 shadow-sm border h-100">
+                    <h5 class="fw-bold mb-3"><i class="fas fa-plus-circle text-primary me-2"></i>Log Study Session</h5>
+                    <form method="POST" action="{{ url_for('user_study') }}">
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Subject / Course</label>
+                            <input type="text" name="subject" class="form-control" placeholder="e.g. AI Systems, Mathematics, Algorithms" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Duration (Hours)</label>
+                            <input type="number" step="0.5" name="hours" class="form-control" placeholder="2.5" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Productivity Score (1 - 100)</label>
+                            <input type="number" name="productivity" min="1" max="100" class="form-control" placeholder="85" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Date</label>
+                            <input type="date" name="date" class="form-control" value="{{ datetime.now().strftime('%Y-%m-%d') }}" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 py-2">
+                            <i class="fas fa-save me-1"></i> Save Log
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Subject Breakdown Chart -->
+            <div class="col-lg-8">
+                <div class="card p-4 rounded-4 shadow-sm border h-100">
+                    <h5 class="fw-bold mb-3"><i class="fas fa-chart-pie text-info me-2"></i>Subject Breakdown</h5>
+                    <div style="height: 280px; position: relative;">
+                        <canvas id="subjectChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Study Logs Table -->
+        <div class="card p-4 rounded-4 shadow-sm border">
+            <h5 class="fw-bold mb-3"><i class="fas fa-history me-2 text-primary"></i>Recent Study Sessions</h5>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Date</th>
+                            <th>Subject</th>
+                            <th>Hours</th>
+                            <th>Productivity</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if logs %}
+                            {% for log in logs %}
+                            <tr>
+                                <td>{{ log.date.strftime('%Y-%m-%d') }}</td>
+                                <td class="fw-semibold">{{ log.subject }}</td>
+                                <td>{{ log.hours }} hrs</td>
+                                <td>
+                                    <span class="badge bg-{{ 'success' if log.productivity_score >= 70 else 'warning' }}">
+                                        {{ log.productivity_score }}%
+                                    </span>
+                                </td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-outline-secondary me-1" onclick="openStudyModal('{{ log.id }}', '{{ log.date.strftime('%Y-%m-%d') }}', '{{ log.subject }}', '{{ log.hours }}', '{{ log.productivity_score }}')">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <form method="POST" action="{{ url_for('delete_study_log', id=log.id) }}" style="display:inline;" onsubmit="return confirm('Delete this log?');">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-4">No study sessions recorded yet.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Study Log Modal -->
+<div class="modal fade" id="editStudyModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('edit_study_log') }}">
+                <input type="hidden" name="id" id="edit_study_id">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">Edit Study Log</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Subject</label>
+                        <input type="text" name="subject" id="edit_study_subject" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Hours</label>
+                        <input type="number" step="0.5" name="hours" id="edit_study_hours" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Productivity Score</label>
+                        <input type="number" name="productivity" id="edit_study_productivity" min="1" max="100" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Date</label>
+                        <input type="date" name="date" id="edit_study_date" class="form-control" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function openStudyModal(id, date, subject, hours, prod) {
+    document.getElementById('edit_study_id').value = id;
+    document.getElementById('edit_study_date').value = date;
+    document.getElementById('edit_study_subject').value = subject;
+    document.getElementById('edit_study_hours').value = hours;
+    document.getElementById('edit_study_productivity').value = prod;
+    new bootstrap.Modal(document.getElementById('editStudyModal')).show();
+}
+
+const subjects = {{ subjects|tojson }};
+const subjectHours = {{ subject_hours|tojson }};
+
+if (subjects.length > 0) {
+    const ctx = document.getElementById('subjectChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: subjects,
+            datasets: [{
+                data: subjectHours,
+                backgroundColor: ['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ec4899', '#6366f1']
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+}
+</script>
+{% endblock %}

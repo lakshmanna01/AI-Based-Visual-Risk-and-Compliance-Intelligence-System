@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="fitness-wrapper py-4">
+    <div class="container">
+        <!-- Top Metrics Cards -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="card p-3 rounded-4 shadow-sm border">
+                    <span class="text-muted small">Total Active Time</span>
+                    <h3 class="fw-bold text-success mb-0">{{ total_min }} <span class="fs-6 fw-normal">min</span></h3>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card p-3 rounded-4 shadow-sm border">
+                    <span class="text-muted small">Calories Burned</span>
+                    <h3 class="fw-bold text-danger mb-0">{{ '{:,.0f}'.format(total_cal) }} <span class="fs-6 fw-normal">kcal</span></h3>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card p-3 rounded-4 shadow-sm border">
+                    <span class="text-muted small">Weekly Goal (150m)</span>
+                    <h3 class="fw-bold text-primary mb-0">{{ week_progress }}%</h3>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card p-3 rounded-4 shadow-sm border">
+                    <span class="text-muted small">Fitness Streak</span>
+                    <h3 class="fw-bold text-warning mb-0">{{ streak }} Days</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <!-- Log Workout Form -->
+            <div class="col-lg-4">
+                <div class="card p-4 rounded-4 shadow-sm border h-100">
+                    <h5 class="fw-bold mb-3"><i class="fas fa-plus-circle text-primary me-2"></i>Log Fitness Workout</h5>
+                    <form method="POST" action="{{ url_for('user_fitness') }}">
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Activity</label>
+                            <input type="text" name="activity" class="form-control" placeholder="e.g. Running, Gym, Cycling, Yoga" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Duration (Minutes)</label>
+                            <input type="number" name="duration" class="form-control" placeholder="45" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Estimated Calories</label>
+                            <input type="number" name="calories" class="form-control" placeholder="300" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Date</label>
+                            <input type="date" name="date" class="form-control" value="{{ datetime.now().strftime('%Y-%m-%d') }}" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 py-2">
+                            <i class="fas fa-save me-1"></i> Save Workout
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Activity Trends Chart -->
+            <div class="col-lg-8">
+                <div class="card p-4 rounded-4 shadow-sm border h-100">
+                    <h5 class="fw-bold mb-3"><i class="fas fa-chart-line text-success me-2"></i>14-Day Activity Trend</h5>
+                    <div style="height: 280px; position: relative;">
+                        <canvas id="fitnessChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Logs Table -->
+        <div class="card p-4 rounded-4 shadow-sm border">
+            <h5 class="fw-bold mb-3"><i class="fas fa-history me-2 text-primary"></i>Recent Activities</h5>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Date</th>
+                            <th>Activity</th>
+                            <th>Duration</th>
+                            <th>Calories</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if logs %}
+                            {% for log in logs %}
+                            <tr>
+                                <td>{{ log.date.strftime('%Y-%m-%d') }}</td>
+                                <td class="fw-semibold">{{ log.activity }}</td>
+                                <td>{{ log.duration_min }} mins</td>
+                                <td><span class="badge bg-danger">{{ log.calories_burned }} kcal</span></td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-outline-secondary me-1" onclick="openFitModal('{{ log.id }}', '{{ log.date.strftime('%Y-%m-%d') }}', '{{ log.activity }}', '{{ log.duration_min }}', '{{ log.calories_burned }}')">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <form method="POST" action="{{ url_for('delete_fitness', log_id=log.id) }}" style="display:inline;" onsubmit="return confirm('Delete this workout log?');">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-4">No workout activities logged yet.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Fitness Modal -->
+<div class="modal fade" id="editFitModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" id="editFitForm" action="">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">Edit Workout Log</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Activity</label>
+                        <input type="text" name="activity" id="edit_fit_activity" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Duration (min)</label>
+                        <input type="number" name="duration" id="edit_fit_duration" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Calories Burned</label>
+                        <input type="number" name="calories" id="edit_fit_calories" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Date</label>
+                        <input type="date" name="date" id="edit_fit_date" class="form-control" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function openFitModal(id, date, activity, duration, calories) {
+    document.getElementById('editFitForm').action = '/fitness/edit/' + id;
+    document.getElementById('edit_fit_date').value = date;
+    document.getElementById('edit_fit_activity').value = activity;
+    document.getElementById('edit_fit_duration').value = duration;
+    document.getElementById('edit_fit_calories').value = calories;
+    new bootstrap.Modal(document.getElementById('editFitModal')).show();
+}
+
+const dates = {{ dates|tojson }};
+const dailyData = {{ daily_data|tojson }};
+
+const ctx = document.getElementById('fitnessChart').getContext('2d');
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: dates,
+        datasets: [{
+            label: 'Minutes Active',
+            data: dailyData,
+            backgroundColor: '#10b981',
+            borderRadius: 6
+        }]
+    },
+    options: { responsive: true, maintainAspectRatio: false }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+    .auth-wrapper {
+        min-height: calc(100vh - 180px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 3rem 1rem;
+    }
+    .auth-card {
+        border-radius: 20px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+        max-width: 480px;
+        width: 100%;
+        background: var(--bg-card) !important;
+    }
+    .auth-header {
+        background: var(--accent-gradient);
+        color: white;
+        padding: 2.2rem 2rem;
+        text-align: center;
+    }
+    .auth-header i {
+        font-size: 2.8rem;
+        margin-bottom: 0.75rem;
+    }
+    .auth-body {
+        padding: 2.5rem 2rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="card auth-card">
+        <div class="auth-header">
+            <i class="fas fa-user-plus"></i>
+            <h3 class="fw-bold mb-1">Create Account</h3>
+            <p class="mb-0 opacity-75 small">Join Visual Risk &amp; AI Intelligence today</p>
+        </div>
+        <div class="auth-body">
+            <form method="POST" action="{{ url_for('register') }}">
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small text-muted">Username</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent border-end-0"><i class="fas fa-user text-muted"></i></span>
+                        <input type="text" name="username" class="form-control border-start-0 ps-0" placeholder="Choose a username" required autofocus>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small text-muted">Email Address</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent border-end-0"><i class="fas fa-envelope text-muted"></i></span>
+                        <input type="email" name="email" class="form-control border-start-0 ps-0" placeholder="name@example.com" required>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small text-muted">Password (minimum 8 characters)</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent border-end-0"><i class="fas fa-lock text-muted"></i></span>
+                        <input type="password" name="password" minlength="8" class="form-control border-start-0 ps-0" placeholder="Create strong password" required>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-semibold small text-muted">Confirm Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent border-end-0"><i class="fas fa-check-circle text-muted"></i></span>
+                        <input type="password" name="confirm_password" minlength="8" class="form-control border-start-0 ps-0" placeholder="Re-enter password" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold shadow-sm">
+                    <i class="fas fa-arrow-right me-1"></i> Register Now
+                </button>
+            </form>
+
+            <div class="text-center mt-4">
+                <span class="text-muted small">Already have an account?</span>
+                <a href="{{ url_for('login') }}" class="small fw-semibold text-decoration-none ms-1" style="color: var(--accent);">Sign In</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

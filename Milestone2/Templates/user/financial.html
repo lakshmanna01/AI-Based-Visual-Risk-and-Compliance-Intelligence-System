@@ -1,0 +1,383 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+    .finance-wrapper {
+        padding: 2.5rem 0 4rem;
+    }
+    .metric-card-fin {
+        border-radius: 16px;
+        padding: 1.5rem;
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow);
+        transition: transform 0.2s;
+    }
+    .metric-card-fin:hover {
+        transform: translateY(-3px);
+    }
+    .chart-box-fin {
+        border-radius: 18px;
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow);
+        padding: 1.8rem;
+        height: 100%;
+    }
+    .fin-table-card {
+        border-radius: 18px;
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow);
+        padding: 2rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="finance-wrapper">
+    <div class="container">
+        <!-- Page Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+            <div>
+                <span class="badge bg-primary px-3 py-1 rounded-pill mb-1">
+                    <i class="fas fa-coins me-1"></i> Milestone 2: Financial Management
+                </span>
+                <h2 class="fw-bold mb-0">Financial Risk &amp; Cashflow Intelligence</h2>
+                <p class="text-muted small mb-0">Real-time telemetry, expense categorization, and 6-month ML predictive forecasts</p>
+            </div>
+            <div>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTxModal">
+                    <i class="fas fa-plus-circle me-1"></i> New Transaction
+                </button>
+            </div>
+        </div>
+
+        <!-- 4 Top Metric Cards -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="metric-card-fin">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="text-muted small text-uppercase fw-semibold">Total Inflow</span>
+                        <i class="fas fa-arrow-down text-success"></i>
+                    </div>
+                    <h3 class="fw-bold text-success mb-1">₹{{ '{:,.0f}'.format(metrics['income']) }}</h3>
+                    <span class="small text-muted">All income streams</span>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="metric-card-fin">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="text-muted small text-uppercase fw-semibold">Total Outflow</span>
+                        <i class="fas fa-arrow-up text-danger"></i>
+                    </div>
+                    <h3 class="fw-bold text-danger mb-1">₹{{ '{:,.0f}'.format(metrics['expenses']) }}</h3>
+                    <span class="small text-muted">Discretionary &amp; fixed</span>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="metric-card-fin">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="text-muted small text-uppercase fw-semibold">Net Cashflow</span>
+                        <i class="fas fa-wallet text-primary"></i>
+                    </div>
+                    <h3 class="fw-bold text-primary mb-1">₹{{ '{:,.0f}'.format(metrics['net']) }}</h3>
+                    <span class="small text-muted">Income minus expenses</span>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="metric-card-fin">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="text-muted small text-uppercase fw-semibold">Savings Rate</span>
+                        <i class="fas fa-percentage text-info"></i>
+                    </div>
+                    <h3 class="fw-bold text-info mb-1">{{ metrics['rate']|round(1) }}%</h3>
+                    <div class="progress mt-2" style="height: 6px;">
+                        <div class="progress-bar bg-info" style="width: {{ [metrics['rate'], 100]|min }}%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Grid: Expense Breakdown & 6-Month Predictive Forecast -->
+        <div class="row g-4 mb-4">
+            <!-- Expense Breakdown Pie Chart -->
+            <div class="col-lg-5">
+                <div class="chart-box-fin">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold mb-0"><i class="fas fa-chart-pie text-primary me-2"></i>Expense Breakdown</h5>
+                    </div>
+                    <div style="height: 270px; position: relative;">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6-Month Expense Forecast Chart -->
+            <div class="col-lg-7">
+                <div class="chart-box-fin">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h5 class="fw-bold mb-0"><i class="fas fa-chart-line text-success me-2"></i>6-Month Predictive Expense Forecast</h5>
+                            <small class="text-muted">Powered by scikit-learn Linear Regression trend analysis</small>
+                        </div>
+                    </div>
+                    <div style="height: 270px; position: relative;">
+                        <canvas id="forecastChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Transactions Table Card -->
+        <div class="fin-table-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0"><i class="fas fa-list-alt text-primary me-2"></i>Transaction Ledger (Latest Records)</h5>
+                <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addTxModal">
+                    <i class="fas fa-plus me-1"></i> Add Entry
+                </button>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Date</th>
+                            <th>Flow Type</th>
+                            <th>Category</th>
+                            <th>Amount (₹)</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if transactions %}
+                            {% for tx in transactions %}
+                            <tr>
+                                <td>{{ tx.date.strftime('%Y-%m-%d') }}</td>
+                                <td>
+                                    <span class="badge bg-{{ 'success' if tx.type == 'income' else 'danger' }} px-2 py-1">
+                                        <i class="fas fa-{{ 'arrow-down' if tx.type == 'income' else 'arrow-up' }} me-1"></i>
+                                        {{ tx.type|capitalize }}
+                                    </span>
+                                </td>
+                                <td class="fw-semibold">{{ tx.category }}</td>
+                                <td class="fw-bold text-{{ 'success' if tx.type == 'income' else 'danger' }}">
+                                    {{ '+' if tx.type == 'income' else '-' }}₹{{ '{:,.2f}'.format(tx.amount) }}
+                                </td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-outline-secondary me-1" title="Edit" onclick="openEditModal('{{ tx.id }}', '{{ tx.date.strftime('%Y-%m-%d') }}', '{{ tx.category }}', '{{ tx.amount }}', '{{ tx.type }}')">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <form method="POST" action="{{ url_for('delete_transaction', id=tx.id) }}" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this transaction?');">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5 text-muted">
+                                    <i class="fas fa-receipt fa-3x mb-3 opacity-25"></i>
+                                    <p class="mb-2">No transactions recorded yet.</p>
+                                    <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addTxModal">
+                                        Record First Transaction
+                                    </button>
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Transaction Modal -->
+<div class="modal fade" id="addTxModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('user_financial') }}">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold"><i class="fas fa-plus-circle text-primary me-2"></i>Record New Transaction</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold text-muted">Flow Type</label>
+                        <select name="type" class="form-select" required>
+                            <option value="expense">Expense (Outflow)</option>
+                            <option value="income">Income (Inflow)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold text-muted">Category</label>
+                        <input type="text" name="category" class="form-control" placeholder="e.g. Salary, Rent, Groceries, Utilities, Books" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold text-muted">Amount (₹)</label>
+                        <input type="number" step="0.01" min="1" name="amount" class="form-control" placeholder="0.00" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold text-muted">Transaction Date</label>
+                        <input type="date" name="date" class="form-control" value="{{ datetime.now().strftime('%Y-%m-%d') }}" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary px-4"><i class="fas fa-save me-1"></i> Save Entry</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Transaction Modal -->
+<div class="modal fade" id="editTxModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('edit_transaction') }}">
+                <input type="hidden" name="id" id="edit_id">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold"><i class="fas fa-edit text-primary me-2"></i>Edit Transaction</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold text-muted">Flow Type</label>
+                        <select name="type" id="edit_type" class="form-select" required>
+                            <option value="expense">Expense (Outflow)</option>
+                            <option value="income">Income (Inflow)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold text-muted">Category</label>
+                        <input type="text" name="category" id="edit_category" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold text-muted">Amount (₹)</label>
+                        <input type="number" step="0.01" min="1" name="amount" id="edit_amount" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold text-muted">Transaction Date</label>
+                        <input type="date" name="date" id="edit_date" class="form-control" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary px-4"><i class="fas fa-check me-1"></i> Update Entry</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function openEditModal(id, date, category, amount, type) {
+    document.getElementById('edit_id').value = id;
+    document.getElementById('edit_date').value = date;
+    document.getElementById('edit_category').value = category;
+    document.getElementById('edit_amount').value = amount;
+    document.getElementById('edit_type').value = type;
+    new bootstrap.Modal(document.getElementById('editTxModal')).show();
+}
+
+// Category Doughnut Chart
+const categories = {{ categories|tojson }};
+const amounts = {{ category_amounts|tojson }};
+
+const catCtx = document.getElementById('categoryChart').getContext('2d');
+if (categories && categories.length > 0) {
+    new Chart(catCtx, {
+        type: 'doughnut',
+        data: {
+            labels: categories,
+            datasets: [{
+                data: amounts,
+                backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4'],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom' }
+            }
+        }
+    });
+} else {
+    catCtx.font = "14px Segoe UI";
+    catCtx.fillStyle = "#a0aec0";
+    catCtx.textAlign = "center";
+    catCtx.fillText("No expense categories recorded yet", 160, 130);
+}
+
+// 6-Month Forecast Chart
+const forecastData = {{ forecast|tojson }};
+const forecastCtx = document.getElementById('forecastChart').getContext('2d');
+const forecastLabels = ['Month +1', 'Month +2', 'Month +3', 'Month +4', 'Month +5', 'Month +6'];
+
+if (forecastData && forecastData.length > 0) {
+    new Chart(forecastCtx, {
+        type: 'line',
+        data: {
+            labels: forecastLabels,
+            datasets: [{
+                label: 'Projected Monthly Expense (₹)',
+                data: forecastData.map(v => Math.max(0, Math.round(v))),
+                borderColor: '#10b981',
+                backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.35,
+                pointRadius: 5,
+                pointBackgroundColor: '#10b981'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(val) { return '₹' + val.toLocaleString(); }
+                    }
+                }
+            }
+        }
+    });
+} else {
+    new Chart(forecastCtx, {
+        type: 'line',
+        data: {
+            labels: forecastLabels,
+            datasets: [{
+                label: 'Estimated Projected Trend (₹)',
+                data: [35000, 36000, 35500, 37000, 36500, 38000],
+                borderColor: '#94a3b8',
+                borderDash: [5, 5],
+                fill: false,
+                tension: 0.3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Record expenses to calibrate machine learning regression model'
+                }
+            }
+        }
+    });
+}
+</script>
+{% endblock %}

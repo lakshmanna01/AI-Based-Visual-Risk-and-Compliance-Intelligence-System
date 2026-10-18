@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <span class="badge bg-danger rounded-pill px-3 py-1 mb-1">Administrative Oversight</span>
+            <h2 class="fw-bold mb-0">System Compliance &amp; Platform Metrics</h2>
+        </div>
+        <a href="{{ url_for('admin_users') }}" class="btn btn-outline-primary">
+            <i class="fas fa-users-cog me-1"></i> Manage Users
+        </a>
+    </div>
+
+    <!-- 4 Counters -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card p-3 rounded-4 shadow-sm border">
+                <span class="text-muted small">Registered Users</span>
+                <h3 class="fw-bold text-primary mb-0">{{ total_users }}</h3>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3 rounded-4 shadow-sm border">
+                <span class="text-muted small">Total Transactions</span>
+                <h3 class="fw-bold text-success mb-0">{{ total_transactions }}</h3>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3 rounded-4 shadow-sm border">
+                <span class="text-muted small">Study Sessions</span>
+                <h3 class="fw-bold text-info mb-0">{{ total_study }}</h3>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3 rounded-4 shadow-sm border">
+                <span class="text-muted small">Fitness Logs</span>
+                <h3 class="fw-bold text-warning mb-0">{{ total_fitness }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Growth Chart & Financial Volume -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-7">
+            <div class="card p-4 rounded-4 shadow-sm border h-100">
+                <h5 class="fw-bold mb-3"><i class="fas fa-user-plus text-primary me-2"></i>User Registrations (Monthly)</h5>
+                <div style="height: 250px;">
+                    <canvas id="userGrowthChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="card p-4 rounded-4 shadow-sm border h-100">
+                <h5 class="fw-bold mb-3"><i class="fas fa-coins text-warning me-2"></i>Platform Financial Volume</h5>
+                <ul class="list-group list-group-flush mb-3">
+                    <li class="list-group-item bg-transparent d-flex justify-content-between">
+                        <span class="text-muted">Total Inflow (Income):</span>
+                        <strong class="text-success">₹{{ '{:,.0f}'.format(total_income) }}</strong>
+                    </li>
+                    <li class="list-group-item bg-transparent d-flex justify-content-between">
+                        <span class="text-muted">Total Outflow (Expenses):</span>
+                        <strong class="text-danger">₹{{ '{:,.0f}'.format(total_expense) }}</strong>
+                    </li>
+                    <li class="list-group-item bg-transparent d-flex justify-content-between">
+                        <span class="text-muted">Avg User Savings Balance:</span>
+                        <strong class="text-primary">₹{{ '{:,.0f}'.format(avg_savings) }}</strong>
+                    </li>
+                    <li class="list-group-item bg-transparent d-flex justify-content-between">
+                        <span class="text-muted">Goal Completion Rate:</span>
+                        <strong class="text-info">{{ goal_completion_rate|round(1) }}%</strong>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Users & Recent Activity -->
+    <div class="row g-4">
+        <div class="col-lg-5">
+            <div class="card p-4 rounded-4 shadow-sm border h-100">
+                <h5 class="fw-bold mb-3"><i class="fas fa-fire text-danger me-2"></i>Most Active Users</h5>
+                <div class="list-group list-group-flush">
+                    {% if active_users %}
+                        {% for user in active_users %}
+                        <div class="list-group-item bg-transparent d-flex justify-content-between align-items-center px-0">
+                            <span class="fw-semibold"><i class="fas fa-user-circle me-2 text-muted"></i>{{ user.username }}</span>
+                            <span class="badge bg-primary rounded-pill">{{ user.tx_count }} Transactions</span>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted small">No active transaction records yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            <div class="card p-4 rounded-4 shadow-sm border h-100">
+                <h5 class="fw-bold mb-3"><i class="fas fa-stream text-primary me-2"></i>Live Activity Feed</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>User</th>
+                                <th>Domain</th>
+                                <th>Event Details</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if recent_activity %}
+                                {% for act in recent_activity %}
+                                <tr>
+                                    <td class="fw-semibold">{{ act.user }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ 'primary' if act.type == 'transaction' else ('info' if act.type == 'study' else 'success') }}">
+                                            {{ act.type|capitalize }}
+                                        </span>
+                                    </td>
+                                    <td class="small">{{ act.detail }}</td>
+                                    <td class="text-muted small">{{ act.date }}</td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted py-3">No activity logs recorded yet.</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const months = {{ months|tojson }};
+const userCounts = {{ user_counts|tojson }};
+
+const ctx = document.getElementById('userGrowthChart').getContext('2d');
+new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: months,
+        datasets: [{
+            label: 'New Registrations',
+            data: userCounts,
+            borderColor: '#667eea',
+            backgroundColor: 'rgba(102, 126, 234, 0.15)',
+            fill: true,
+            tension: 0.3
+        }]
+    },
+    options: { responsive: true, maintainAspectRatio: false }
+});
+</script>
+{% endblock %}
