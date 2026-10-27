@@ -3,8 +3,11 @@ import sys
 import uuid
 
 root = os.path.dirname(os.path.abspath(__file__))
-m2_dir = os.path.join(root, "Milestone2")
+m2_dir = os.path.join(root, "Milestone 2", "Ai-based-visual-risk")
+if not os.path.exists(m2_dir):
+    m2_dir = os.path.join(root, "Milestone2")
 os.chdir(m2_dir)
+sys.path.insert(0, m2_dir)
 
 from app import app, db, User, Transaction, create_default_admin
 

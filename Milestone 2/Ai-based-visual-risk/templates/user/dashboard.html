@@ -1,0 +1,269 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+    .dashboard-wrapper {
+        padding: 2rem 0 4rem;
+    }
+    .metric-card-top {
+        border-radius: 18px;
+        padding: 1.5rem;
+        color: white;
+        transition: transform 0.25s;
+        border: none;
+    }
+    .metric-card-top:hover {
+        transform: translateY(-4px);
+    }
+    .gradient-blue { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+    .gradient-purple { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
+    .gradient-teal { background: linear-gradient(135deg, #10b981, #047857); }
+    .gradient-amber { background: linear-gradient(135deg, #f59e0b, #b45309); }
+    .chart-card {
+        border-radius: 18px;
+        padding: 1.5rem;
+        height: 100%;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    <div class="container">
+        <!-- Welcome Banner -->
+        <div class="card p-4 rounded-4 mb-4 border">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h2 class="fw-bold mb-1">Welcome back, {{ user.username }}! 👋</h2>
+                    <p class="text-muted mb-0">Here is your real-time risk intelligence and digital twin lifestyle matrix.</p>
+                </div>
+                <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                    <div class="d-inline-block text-center p-3 rounded-4 bg-light border">
+                        <span class="text-muted small d-block">Overall Life Score</span>
+                        <h3 class="fw-bold text-primary mb-0">{{ life_score }}/100</h3>
+                        <div class="progress mt-2" style="height: 8px; width: 120px;">
+                            <div class="progress-bar bg-success" style="width: {{ life_score }}%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4 Top Metric Cards -->
+        <div class="row g-3 mb-4">
+            <div class="col-xl-3 col-md-6">
+                <div class="metric-card-top gradient-blue shadow-sm">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="opacity-75 small text-uppercase fw-semibold">Savings &amp; Net</span>
+                        <i class="fas fa-wallet fa-lg"></i>
+                    </div>
+                    <h3 class="fw-bold mb-1">₹{{ '{:,.0f}'.format(user.savings) }}</h3>
+                    <div class="small opacity-90">Savings Rate: <strong>{{ metrics['rate']|round(1) }}%</strong></div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6">
+                <div class="metric-card-top gradient-purple shadow-sm">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="opacity-75 small text-uppercase fw-semibold">Academic GPA</span>
+                        <i class="fas fa-graduation-cap fa-lg"></i>
+                    </div>
+                    <h3 class="fw-bold mb-1">{{ gpa['gpa'] }} / 4.0</h3>
+                    <div class="small opacity-90">Efficiency: <strong>{{ gpa['efficiency'] }}%</strong> ({{ total_study_hours }}h logged)</div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6">
+                <div class="metric-card-top gradient-teal shadow-sm">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="opacity-75 small text-uppercase fw-semibold">Fitness Activity</span>
+                        <i class="fas fa-heartbeat fa-lg"></i>
+                    </div>
+                    <h3 class="fw-bold mb-1">{{ total_fitness }} <span class="fs-6 fw-normal">min</span></h3>
+                    <div class="small opacity-90">Streak: <strong>{{ fitness_streak }} days</strong> active</div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6">
+                <div class="metric-card-top gradient-amber shadow-sm">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="opacity-75 small text-uppercase fw-semibold">Personal Goals</span>
+                        <i class="fas fa-bullseye fa-lg"></i>
+                    </div>
+                    <h3 class="fw-bold mb-1">{{ goal_progress|length }} <span class="fs-6 fw-normal">tracked</span></h3>
+                    <div class="small opacity-90">Study Streak: <strong>{{ study_streak }} days</strong></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Predictive Insights Section -->
+        <div class="card p-4 rounded-4 mb-4 border">
+            <h5 class="fw-bold mb-3"><i class="fas fa-magic text-primary me-2"></i>AI Predictive Intelligence &amp; Forecasts</h5>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="p-3 rounded-3 bg-light border">
+                        <div class="text-muted small">6-Month Projected Savings</div>
+                        <h4 class="fw-bold text-success mt-1">₹{{ '{:,.0f}'.format(savings_forecast[-1]) }}</h4>
+                        <p class="small text-muted mb-0">Projected based on income/expense linear regression.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-3 rounded-3 bg-light border">
+                        <div class="text-muted small">Projected GPA Trend</div>
+                        <h4 class="fw-bold text-primary mt-1">{{ gpa_forecast[-1] }} / 4.0</h4>
+                        <p class="small text-muted mb-0">{{ gpa['recommendation'] }}</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-3 rounded-3 bg-light border">
+                        <div class="text-muted small">30-Day Fitness Projection</div>
+                        <h4 class="fw-bold text-info mt-1">{{ '{:,.0f}'.format(projected_fitness) }} min</h4>
+                        <p class="small text-muted mb-0">Forecasted active minutes based on latest routine.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="row g-4 mb-4">
+            <div class="col-lg-6">
+                <div class="card chart-card">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="fw-bold mb-0"><i class="fas fa-chart-bar text-primary me-2"></i>Income vs. Expenses (Last 6 Months)</h6>
+                        <a href="{{ url_for('user_financial') }}" class="btn btn-sm btn-outline-primary">Manage</a>
+                    </div>
+                    <canvas id="financeChart" height="200"></canvas>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="card chart-card">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="fw-bold mb-0"><i class="fas fa-book-reader text-purple me-2"></i>Study Hours (Last 14 Days)</h6>
+                        <a href="{{ url_for('user_study') }}" class="btn btn-sm btn-outline-primary">Log Session</a>
+                    </div>
+                    <canvas id="studyChart" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Goals & Actions -->
+        <div class="row g-4">
+            <div class="col-lg-7">
+                <div class="card p-4 rounded-4 h-100 border">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold mb-0"><i class="fas fa-tasks text-warning me-2"></i>Goals Progress</h5>
+                        <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#goalModal">
+                            <i class="fas fa-plus me-1"></i> Add Goal
+                        </button>
+                    </div>
+                    {% if goal_progress %}
+                        {% for gp in goal_progress %}
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between small fw-semibold mb-1">
+                                <span>{{ gp.description }}</span>
+                                <span>{{ gp.progress }}%</span>
+                            </div>
+                            <div class="progress" style="height: 10px;">
+                                <div class="progress-bar bg-primary" style="width: {{ gp.progress }}%;"></div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted small">No goals set yet. Click "Add Goal" above to create your first milestone!</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="card p-4 rounded-4 h-100 border">
+                    <h5 class="fw-bold mb-3"><i class="fas fa-bolt text-danger me-2"></i>Quick Actions</h5>
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('user_simulation') }}" class="btn btn-outline-primary py-2 text-start">
+                            <i class="fas fa-play me-2"></i> Run What-If Future Simulation
+                        </a>
+                        <a href="{{ url_for('user_assistant') }}" class="btn btn-outline-primary py-2 text-start">
+                            <i class="fas fa-robot me-2"></i> Ask AI Decision Assistant
+                        </a>
+                        <a href="{{ url_for('user_fitness') }}" class="btn btn-outline-primary py-2 text-start">
+                            <i class="fas fa-running me-2"></i> Log Daily Fitness Workout
+                        </a>
+                        <a href="{{ url_for('user_financial') }}" class="btn btn-outline-primary py-2 text-start">
+                            <i class="fas fa-plus-circle me-2"></i> Record Transaction
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Goal Modal -->
+<div class="modal fade" id="goalModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('add_goal') }}">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">Add New Goal</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small">Description</label>
+                        <input type="text" name="description" class="form-control" placeholder="e.g. Save ₹50,000 or complete Cloud cert" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small">Target Date</label>
+                        <input type="date" name="target_date" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Goal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const months = {{ months|tojson }};
+const incomeData = {{ income_data|tojson }};
+const expenseData = {{ expense_data|tojson }};
+
+const ctx1 = document.getElementById('financeChart').getContext('2d');
+new Chart(ctx1, {
+    type: 'bar',
+    data: {
+        labels: months,
+        datasets: [
+            { label: 'Income (₹)', data: incomeData, backgroundColor: '#3b82f6', borderRadius: 6 },
+            { label: 'Expenses (₹)', data: expenseData, backgroundColor: '#ef4444', borderRadius: 6 }
+        ]
+    },
+    options: { responsive: true, maintainAspectRatio: false }
+});
+
+const studyDays = {{ study_days|tojson }};
+const studyHours = {{ study_hours|tojson }};
+
+const ctx2 = document.getElementById('studyChart').getContext('2d');
+new Chart(ctx2, {
+    type: 'line',
+    data: {
+        labels: studyDays,
+        datasets: [{
+            label: 'Hours Studied',
+            data: studyHours,
+            borderColor: '#8b5cf6',
+            backgroundColor: 'rgba(139, 92, 246, 0.1)',
+            fill: true,
+            tension: 0.3
+        }]
+    },
+    options: { responsive: true, maintainAspectRatio: false }
+});
+</script>
+{% endblock %}
